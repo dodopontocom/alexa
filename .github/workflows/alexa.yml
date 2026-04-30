@@ -150,24 +150,6 @@ jobs:
           echo "### 🚀 Set and Build Bora Interaction Model"
           ask smapi set-interaction-model --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 --stage development --locale pt-BR --interaction-model "$(cat skill-package/interactionModels/custom/pt-BR.json)"
 
-      - name: Verify Bora Build Status
-        if: github.event.inputs.deploy_bora == 'true'
-        run: |
-          echo "### ⏳ Waiting for Interaction Model Build"
-          for i in {1..20}; do
-            BUILD_STATUS=$(ask smapi get-skill-status --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 | jq -r '.interactionModel."pt-BR".buildDetails.status // "PENDING"')
-            echo "Build Status: $BUILD_STATUS"
-            if [ "$BUILD_STATUS" == "SUCCEEDED" ]; then
-              echo "✅ Interaction model build succeeded!"
-              break
-            fi
-            if [ "$BUILD_STATUS" == "FAILED" ]; then
-              echo "❌ Interaction model build failed!"
-              exit 1
-            fi
-            sleep 15
-          done
-
       - name: Deploy Finances
         if: github.event.inputs.deploy_finances == 'true'
         run: |
@@ -191,21 +173,3 @@ jobs:
 
           echo "### 🚀 Set and Build Finances Interaction Model"
           ask smapi set-interaction-model --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 --stage development --locale pt-BR --interaction-model "$(cat skill-package/interactionModels/custom/pt-BR.json)"
-
-      - name: Verify Finances Build Status
-        if: github.event.inputs.deploy_finances == 'true'
-        run: |
-          echo "### ⏳ Waiting for Interaction Model Build"
-          for i in {1..20}; do
-            BUILD_STATUS=$(ask smapi get-skill-status --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 | jq -r '.interactionModel."pt-BR".buildDetails.status // "PENDING"')
-            echo "Build Status: $BUILD_STATUS"
-            if [ "$BUILD_STATUS" == "SUCCEEDED" ]; then
-              echo "✅ Interaction model build succeeded!"
-              break
-            fi
-            if [ "$BUILD_STATUS" == "FAILED" ]; then
-              echo "❌ Interaction model build failed!"
-              exit 1
-            fi
-            sleep 15
-          done
