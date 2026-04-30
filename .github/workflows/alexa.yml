@@ -1,0 +1,40 @@
+name: Alexa Skills
+
+on:
+  workflow_dispatch:
+
+jobs:
+  list-skills:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install ASK CLI
+        run: npm install -g ask-cli
+
+      - name: Configure ASK CLI
+        run: |
+          mkdir -p ~/.ask
+          cat > ~/.ask/cli_config << EOF
+          {
+            "profiles": {
+              "default": {
+                "token": {
+                  "access_token": "${{ secrets.ASK_ACCESS_TOKEN }}",
+                  "refresh_token": "${{ secrets.ASK_REFRESH_TOKEN }}",
+                  "token_type": "bearer"
+                },
+                "vendor_id": "${{ secrets.ASK_VENDOR_ID }}"
+              }
+            }
+          }
+          EOF
+
+      - name: List Skills
+        run: ask smapi list-skills-for-vendor
