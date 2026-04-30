@@ -60,7 +60,6 @@ jobs:
 
       - name: Populate .env for Finances
         run: |
-          mkdir -p Finances/lambda
           cat > Finances/lambda/.env << EOF
           GITHUB_TOKEN=${{ secrets.MY_GITHUB_PAT }}
           EOF
