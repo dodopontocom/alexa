@@ -108,36 +108,10 @@ jobs:
         if: github.event.inputs.deploy_bora == 'true'
         run: |
           cd Bora
-          git config --global user.email "workflow@github.actions"
-          git config --global user.name "Github Workflow"
-          git init
-          # Obter URL e Access Token para autenticação básica
-          REPO_URL=$(ask smapi get-alexa-hosted-skill-metadata --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 | jq -r '.alexaHosted.repository.url')
-          ACCESS_TOKEN=$(cat ~/.ask/cli_config | jq -r '.profiles.default.token.access_token')
-          
-          # Injetar token na URL para evitar prompt de senha
-          AUTH_URL=$(echo $REPO_URL | sed "s/https:\/\//https:\/\/x-token-auth:$ACCESS_TOKEN@/")
-          
-          git remote add ask "$AUTH_URL"
-          git add .
-          git commit -m "Deploy via GitHub Actions"
-          git push ask master --force
+          ask deploy
 
       - name: Deploy Finances
         if: github.event.inputs.deploy_finances == 'true'
         run: |
           cd Finances
-          git config --global user.email "workflow@github.actions"
-          git config --global user.name "Github Workflow"
-          git init
-          # Obter URL e Access Token para autenticação básica
-          REPO_URL=$(ask smapi get-alexa-hosted-skill-metadata --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 | jq -r '.alexaHosted.repository.url')
-          ACCESS_TOKEN=$(cat ~/.ask/cli_config | jq -r '.profiles.default.token.access_token')
-          
-          # Injetar token na URL para evitar prompt de senha
-          AUTH_URL=$(echo $REPO_URL | sed "s/https:\/\//https:\/\/x-token-auth:$ACCESS_TOKEN@/")
-          
-          git remote add ask "$AUTH_URL"
-          git add .
-          git commit -m "Deploy via GitHub Actions"
-          git push ask master --force
+          ask deploy
