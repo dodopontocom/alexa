@@ -1,0 +1,85 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PauseIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ResumeIntent",
+          "samples": []
+        },
+        {
+          "slots": [],
+          "name": "PlayAutoplagioIntent",
+          "samples": [
+            "tocar a música autoral",
+            "toque a música autoral",
+            "tocar música autoral",
+            "tocar autoplágio",
+            "tocar eu vou roubar"
+          ]
+        },
+        {
+          "slots": [
+            {
+              "name": "transacao",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "name": "ChatFinancesIntent",
+          "samples": [
+            "adicionar {transacao}",
+            "comprei {transacao}",
+            "recebi {transacao}"
+          ]
+        },
+        {
+          "slots": [
+            {
+              "name": "relato",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "name": "ReportIssueIntent",
+          "samples": [
+            "o cliente {relato}"
+          ]
+        },
+        {
+          "slots": [],
+          "name": "ClosedIssuesCountIntent",
+          "samples": [
+            "me mostre o ranking",
+            "qual é o ranking dos desenvolvedores",
+            "quem está na liderança",
+            "me diga o top três"
+          ]
+        }
+      ],
+      "types": [],
+      "invocationName": "modo secreto"
+    }
+  }
+}
