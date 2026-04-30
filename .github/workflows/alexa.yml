@@ -145,6 +145,7 @@ jobs:
           git add .
           git commit -m "Deploy Bora via GitHub Actions" || echo "No changes to commit"
           git push ask master --force
+          git push ask master:dev --force
 
       - name: Deploy Finances
         if: github.event.inputs.deploy_finances == 'true'
@@ -165,3 +166,4 @@ jobs:
           git add .
           git commit -m "Deploy Finances via GitHub Actions" || echo "No changes to commit"
           git push ask master --force
+          git push ask master:dev --force
