@@ -2,10 +2,24 @@ name: Alexa Skills
 
 on:
   workflow_dispatch:
+    inputs:
+      deploy_bora:
+        description: 'Fazer deploy da skill Bora?'
+        required: true
+        type: boolean
+        default: true
+      deploy_finances:
+        description: 'Fazer deploy da skill Finances?'
+        required: true
+        type: boolean
+        default: true
+
+env:
+  ASK_VERSION: '2.30.7'
+  NODE_VERSION: '20'
 
 jobs:
-  list-skills:
-    runs-on: ubuntu-latest
+  list-skills:    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -13,11 +27,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install ASK CLI
-        run: npm install -g ask-cli
-
+        run: npm install -g ask-cli@${{ env.ASK_VERSION }}
       - name: Configure ASK CLI
         run: |
           mkdir -p ~/.ask
@@ -57,19 +70,47 @@ jobs:
           cat > Bora/lambda/.env << EOF
           GITHUB_TOKEN=${{ secrets.MY_GITHUB_PAT }}
           EOF
+          cat > Bora/ask-resources.json << EOF
+          {
+            "askcliResourcesVersion": "2020-03-31",
+            "profiles": {
+              "default": {
+                "skillId": "amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07",
+                "skillInfrastructure": {
+                  "type": "@ask-cli/hosted-skill-deployer"
+                }
+              }
+            }
+          }
+          EOF
 
       - name: Populate .env for Finances
         run: |
           cat > Finances/lambda/.env << EOF
           GITHUB_TOKEN=${{ secrets.MY_GITHUB_PAT }}
           EOF
+          cat > Finances/ask-resources.json << EOF
+          {
+            "askcliResourcesVersion": "2020-03-31",
+            "profiles": {
+              "default": {
+                "skillId": "amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3",
+                "skillInfrastructure": {
+                  "type": "@ask-cli/hosted-skill-deployer"
+                }
+              }
+            }
+          }
+          EOF
 
       - name: Deploy Bora
+        if: github.event.inputs.deploy_bora == 'true'
         run: |
           cd Bora
           ask deploy
 
       - name: Deploy Finances
+        if: github.event.inputs.deploy_finances == 'true'
         run: |
           cd Finances
           ask deploy
