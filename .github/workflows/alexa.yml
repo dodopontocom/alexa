@@ -39,14 +39,21 @@ jobs:
       - name: List Skills
         run: ask smapi list-skills-for-vendor
 
+      - name: Validate GitHub Token
+        env:
+          GH_TOKEN: ${{ secrets.MY_GITHUB_PAT }}
+        run: |
+          gh auth status
+          gh issue list --repo dodopontocom/finances --limit 5
+
       - name: Populate .env for Bora
         run: |
           cat > Bora/lambda/.env << EOF
-          GITHUB_TOKEN=${{ secrets.G_TOKEN }}
+          GITHUB_TOKEN=${{ secrets.MY_GITHUB_PAT }}
           EOF
 
       - name: Populate .env for Finances
         run: |
           cat > Finances/lambda/.env << EOF
-          GITHUB_TOKEN=${{ secrets.G_TOKEN }}
+          GITHUB_TOKEN=${{ secrets.MY_GITHUB_PAT }}
           EOF
