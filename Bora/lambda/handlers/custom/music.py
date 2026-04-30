@@ -67,7 +67,7 @@ class PlayAutoplagioFinalIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         try:
             MUSIC_DATA = {
-                "url": "https://atelie.vibecodia.com.br/autopl%C3%A1gio-vers%C3%A3o-final.mp3",
+                "url": "https://atelie.vibecodia.com.br/autoplagio-versao-final.mp3",
                 "token": "autoplagio-final-track-001",
                 "title": "Autoplágio (Versão Final)",
                 "artist": "Rodolfo Neto"
