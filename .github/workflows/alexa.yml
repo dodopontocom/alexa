@@ -129,51 +129,47 @@ jobs:
       - name: Deploy Bora
         if: github.event.inputs.deploy_bora == 'true'
         run: |
+          cd Bora
+          git init -b master
+          git config user.email "workflow@github.actions"
+          git config user.name "Github Workflow"
+          
           REPO_URL=$(ask smapi get-alexa-hosted-skill-metadata --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 | jq -r '.alexaHosted.repository.url')
           REPO_URL=$(echo "$REPO_URL" | tr -d '`' | xargs)
           
-          # Clone the existing repo to keep hooks and history
-          git clone "$REPO_URL" bora_repo
-          cd bora_repo
-          git config user.email "workflow@github.actions"
-          git config user.name "Github Workflow"
+          git remote add ask "$REPO_URL"
           git config credential.helper "!ask util git-credentials-helper --profile default"
-          
-          # Sync files from Bora/ to the cloned repo
-          cp -r ../Bora/* .
           
           git add .
           git commit -m "Deploy Bora via GitHub Actions" || echo "No changes to commit"
           
-          # Push to both master and main to be sure
-          git push origin master || echo "Master push failed"
-          git push origin main || echo "Main push failed"
+          # Force push to trigger Lambda build on both branches
+          git push ask master --force
+          git push ask master:dev --force
 
           echo "### 🚀 Set and Build Bora Interaction Model"
-          ask smapi set-interaction-model --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 --stage development --locale pt-BR --interaction-model "$(cat ../Bora/skill-package/interactionModels/custom/pt-BR.json)"
+          ask smapi set-interaction-model --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 --stage development --locale pt-BR --interaction-model "$(cat skill-package/interactionModels/custom/pt-BR.json)"
 
       - name: Deploy Finances
         if: github.event.inputs.deploy_finances == 'true'
         run: |
+          cd Finances
+          git init -b master
+          git config user.email "workflow@github.actions"
+          git config user.name "Github Workflow"
+          
           REPO_URL=$(ask smapi get-alexa-hosted-skill-metadata --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 | jq -r '.alexaHosted.repository.url')
           REPO_URL=$(echo "$REPO_URL" | tr -d '`' | xargs)
           
-          # Clone the existing repo to keep hooks and history
-          git clone "$REPO_URL" finances_repo
-          cd finances_repo
-          git config user.email "workflow@github.actions"
-          git config user.name "Github Workflow"
+          git remote add ask "$REPO_URL"
           git config credential.helper "!ask util git-credentials-helper --profile default"
-          
-          # Sync files from Finances/ to the cloned repo
-          cp -r ../Finances/* .
           
           git add .
           git commit -m "Deploy Finances via GitHub Actions" || echo "No changes to commit"
           
-          # Push to both master and main to be sure
-          git push origin master || echo "Master push failed"
-          git push origin main || echo "Main push failed"
+          # Force push to trigger Lambda build on both branches
+          git push ask master --force
+          git push ask master:dev --force
 
           echo "### 🚀 Set and Build Finances Interaction Model"
-          ask smapi set-interaction-model --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 --stage development --locale pt-BR --interaction-model "$(cat ../Finances/skill-package/interactionModels/custom/pt-BR.json)"
+          ask smapi set-interaction-model --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 --stage development --locale pt-BR --interaction-model "$(cat skill-package/interactionModels/custom/pt-BR.json)"
