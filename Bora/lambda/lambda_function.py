@@ -49,10 +49,10 @@ sb.add_request_handler(SessionEndedRequestHandler())
 
 # CUSTOMS AQUI
 sb.add_request_handler(PlayAutoplagioIntentHandler())
-sb.add_request_handler(PlayAutoplagioFinalIntentHandler())
 sb.add_request_handler(ChatFinancesIntentHandler())
 sb.add_request_handler(ReportIssueIntentHandler())
 sb.add_request_handler(ClosedIssuesCountIntentHandler())
+sb.add_request_handler(PlayAutoplagioFinalIntentHandler())
 
 sb.add_request_handler(IntentReflectorHandler())
 sb.add_exception_handler(CatchAllExceptionHandler())
