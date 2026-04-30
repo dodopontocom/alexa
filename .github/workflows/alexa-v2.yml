@@ -18,6 +18,11 @@ on:
         required: true
         type: boolean
         default: true
+      force_validation:
+        description: '🏗️ Force Skill Validation?'
+        required: true
+        type: boolean
+        default: false
       debug_mode:
         description: '🐞 Enable Debug Mode?'
         required: true
@@ -76,6 +81,9 @@ jobs:
             "profiles": {
               "default": {
                 "skillId": "amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07",
+                "skillMetadata": {
+                  "src": "./skill-package"
+                },
                 "skillInfrastructure": {
                   "type": "@ask-cli/hosted-skill-deployer"
                 }
@@ -123,11 +131,13 @@ jobs:
           fi
 
           # Força validação = força build da Lambda
-          echo "### 🏗️ Triggering Hosted Skill Build"
-          ask smapi submit-skill-validation \
-            --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 \
-            --stage development \
-            --locales pt-BR || echo "Validation triggered"
+          if [[ "${{ github.event.inputs.force_validation }}" == "true" ]]; then
+            echo "### 🏗️ Triggering Hosted Skill Build"
+            ask smapi submit-skill-validation \
+              --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 \
+              --stage development \
+              --locales pt-BR || echo "Validation triggered"
+          fi
 
           # Deploy final do skill package
           echo "### 🚀 Final Deploy via ASK CLI"
@@ -195,11 +205,13 @@ jobs:
           fi
 
           # Força validação = força build da Lambda
-          echo "### 🏗️ Triggering Hosted Skill Build"
-          ask smapi submit-skill-validation \
-            --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 \
-            --stage development \
-            --locales pt-BR || echo "Validation triggered"
+          if [[ "${{ github.event.inputs.force_validation }}" == "true" ]]; then
+            echo "### 🏗️ Triggering Hosted Skill Build"
+            ask smapi submit-skill-validation \
+              --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 \
+              --stage development \
+              --locales pt-BR || echo "Validation triggered"
+          fi
 
           # Deploy final do skill package
           echo "### 🚀 Final Deploy via ASK CLI"
