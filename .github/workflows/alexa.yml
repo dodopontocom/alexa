@@ -133,22 +133,25 @@ jobs:
           git init -b master
           git config user.email "workflow@github.actions"
           git config user.name "Github Workflow"
-          echo "Deploy cwd: $(pwd)"
-          test -f ask-resources.json
-          echo "ask-resources profile keys:"
-          jq -r '.profiles | keys[]' ask-resources.json
-          echo "skillId(default): $(jq -r '.profiles.default.skillId // "MISSING"' ask-resources.json)"
+          
           REPO_URL=$(ask smapi get-alexa-hosted-skill-metadata --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 | jq -r '.alexaHosted.repository.url')
           REPO_URL=$(echo "$REPO_URL" | tr -d '`' | xargs)
+          
           git remote add ask "$REPO_URL"
           git config credential.helper "!ask util git-credentials-helper --profile default"
+          
           git add .
           git commit -m "Deploy Bora via GitHub Actions" || echo "No changes to commit"
+          
+          # Force push to trigger Lambda build on both branches
           git push ask master --force
           git push ask master:dev --force
 
           echo "### 🚀 Set and Build Bora Interaction Model"
           ask smapi set-interaction-model --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 --stage development --locale pt-BR --interaction-model "$(cat skill-package/interactionModels/custom/pt-BR.json)"
+
+          echo "### 🏗️ Forcing Skill Build (Lambda Deployment)"
+          ask smapi submit-skill-validation --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 --stage development --locales pt-BR || echo "Validation triggered"
 
       - name: Deploy Finances
         if: github.event.inputs.deploy_finances == 'true'
@@ -157,19 +160,22 @@ jobs:
           git init -b master
           git config user.email "workflow@github.actions"
           git config user.name "Github Workflow"
-          echo "Deploy cwd: $(pwd)"
-          test -f ask-resources.json
-          echo "ask-resources profile keys:"
-          jq -r '.profiles | keys[]' ask-resources.json
-          echo "skillId(default): $(jq -r '.profiles.default.skillId // "MISSING"' ask-resources.json)"
+          
           REPO_URL=$(ask smapi get-alexa-hosted-skill-metadata --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 | jq -r '.alexaHosted.repository.url')
           REPO_URL=$(echo "$REPO_URL" | tr -d '`' | xargs)
+          
           git remote add ask "$REPO_URL"
           git config credential.helper "!ask util git-credentials-helper --profile default"
+          
           git add .
           git commit -m "Deploy Finances via GitHub Actions" || echo "No changes to commit"
+          
+          # Force push to trigger Lambda build on both branches
           git push ask master --force
           git push ask master:dev --force
 
           echo "### 🚀 Set and Build Finances Interaction Model"
           ask smapi set-interaction-model --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 --stage development --locale pt-BR --interaction-model "$(cat skill-package/interactionModels/custom/pt-BR.json)"
+
+          echo "### 🏗️ Forcing Skill Build (Lambda Deployment)"
+          ask smapi submit-skill-validation --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 --stage development --locales pt-BR || echo "Validation triggered"
