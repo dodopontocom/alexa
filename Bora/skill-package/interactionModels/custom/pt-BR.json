@@ -42,6 +42,16 @@
           ]
         },
         {
+          "name": "PlayAutoplagioFinalIntent",
+          "samples": [
+            "tocar versão final",
+            "tocar a versão final",
+            "toque a versão final",
+            "tocar música final",
+            "tocar autoplágio final"
+          ]
+        },
+        {
           "slots": [
             {
               "name": "transacao",

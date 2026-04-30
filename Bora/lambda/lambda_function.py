@@ -27,7 +27,7 @@ from handlers.base.handlers import (
 )
 
 # CUSTOM HANDLERS
-from handlers.custom.music import PlayAutoplagioIntentHandler
+from handlers.custom.music import PlayAutoplagioIntentHandler, PlayAutoplagioFinalIntentHandler
 from handlers.custom.chatia import ChatFinancesIntentHandler
 from handlers.custom.github import ReportIssueIntentHandler
 from handlers.custom.issueleader import ClosedIssuesCountIntentHandler
@@ -49,6 +49,7 @@ sb.add_request_handler(SessionEndedRequestHandler())
 
 # CUSTOMS AQUI
 sb.add_request_handler(PlayAutoplagioIntentHandler())
+sb.add_request_handler(PlayAutoplagioFinalIntentHandler())
 sb.add_request_handler(ChatFinancesIntentHandler())
 sb.add_request_handler(ReportIssueIntentHandler())
 sb.add_request_handler(ClosedIssuesCountIntentHandler())
