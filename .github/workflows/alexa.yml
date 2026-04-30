@@ -108,10 +108,24 @@ jobs:
         if: github.event.inputs.deploy_bora == 'true'
         run: |
           cd Bora
-          ask deploy
+          git config --global user.email "workflow@github.actions"
+          git config --global user.name "Github Workflow"
+          git init
+          git remote add ask $(ask smapi get-hosted-skill-metadata --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 --query "repository.url" --output text)
+          git config --global credential.helper "!ask smapi git-credentials-helper"
+          git add .
+          git commit -m "Deploy via GitHub Actions"
+          git push ask master --force
 
       - name: Deploy Finances
         if: github.event.inputs.deploy_finances == 'true'
         run: |
           cd Finances
-          ask deploy
+          git config --global user.email "workflow@github.actions"
+          git config --global user.name "Github Workflow"
+          git init
+          git remote add ask $(ask smapi get-hosted-skill-metadata --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 --query "repository.url" --output text)
+          git config --global credential.helper "!ask smapi git-credentials-helper"
+          git add .
+          git commit -m "Deploy via GitHub Actions"
+          git push ask master --force
