@@ -111,10 +111,15 @@ jobs:
           git init -b master
           git config user.email "workflow@github.actions"
           git config user.name "Github Workflow"
+          echo "Deploy cwd: $(pwd)"
+          test -f ask-resources.json
+          echo "ask-resources profile keys:"
+          jq -r '.profiles | keys[]' ask-resources.json
+          echo "skillId(default): $(jq -r '.profiles.default.skillId // "MISSING"' ask-resources.json)"
           REPO_URL=$(ask smapi get-alexa-hosted-skill-metadata --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 | jq -r '.alexaHosted.repository.url')
           REPO_URL=$(echo "$REPO_URL" | tr -d '`' | xargs)
           git remote add ask "$REPO_URL"
-          git config credential.helper '!f() { ask util git-credentials-helper "$@"; }; f'
+          git config credential.helper '!f() { ask util git-credentials-helper --profile default "$@"; }; f'
           git add .
           git commit -m "Deploy Bora via GitHub Actions" || echo "No changes to commit"
           git push ask master --force
@@ -126,10 +131,15 @@ jobs:
           git init -b master
           git config user.email "workflow@github.actions"
           git config user.name "Github Workflow"
+          echo "Deploy cwd: $(pwd)"
+          test -f ask-resources.json
+          echo "ask-resources profile keys:"
+          jq -r '.profiles | keys[]' ask-resources.json
+          echo "skillId(default): $(jq -r '.profiles.default.skillId // "MISSING"' ask-resources.json)"
           REPO_URL=$(ask smapi get-alexa-hosted-skill-metadata --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 | jq -r '.alexaHosted.repository.url')
           REPO_URL=$(echo "$REPO_URL" | tr -d '`' | xargs)
           git remote add ask "$REPO_URL"
-          git config credential.helper '!f() { ask util git-credentials-helper "$@"; }; f'
+          git config credential.helper '!f() { ask util git-credentials-helper --profile default "$@"; }; f'
           git add .
           git commit -m "Deploy Finances via GitHub Actions" || echo "No changes to commit"
           git push ask master --force
