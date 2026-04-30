@@ -43,8 +43,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.MY_GITHUB_PAT }}
         run: |
-          gh auth status
-          gh issue list --repo dodopontocom/finances --limit 5
+          echo "### 🔐 GitHub Auth Status" >> $GITHUB_STEP_SUMMARY
+          gh auth status >> $GITHUB_STEP_SUMMARY 2>&1
+          
+          echo "### 📋 Latest Issues (dodopontocom/finances)" >> $GITHUB_STEP_SUMMARY
+          echo "| ID | Status | Title | Labels | Updated |" >> $GITHUB_STEP_SUMMARY
+          echo "|----|--------|-------|--------|---------|" >> $GITHUB_STEP_SUMMARY
+          gh issue list --repo dodopontocom/finances --limit 5 --json number,state,title,labels,updatedAt --template \
+            '{{range .}}| {{.number}} | {{.state}} | {{.title}} | {{range .labels}}{{.name}} {{end}} | {{.updatedAt}} |{{"\n"}}{{end}}' >> $GITHUB_STEP_SUMMARY
 
       - name: Populate .env for Bora
         run: |
