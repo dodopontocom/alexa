@@ -42,13 +42,11 @@ jobs:
       - name: Populate .env for Bora
         run: |
           cat > Bora/lambda/.env << EOF
-          GITHUB_REPO=${{ secrets.G_REPO }}
           GITHUB_TOKEN=${{ secrets.G_TOKEN }}
           EOF
 
       - name: Populate .env for Finances
         run: |
           cat > Finances/lambda/.env << EOF
-          GITHUB_REPO=${{ secrets.G_REPO }}
           GITHUB_TOKEN=${{ secrets.G_TOKEN }}
           EOF
