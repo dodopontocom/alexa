@@ -71,6 +71,7 @@ jobs:
           cat > Bora/lambda/.env << EOF
           GITHUB_TOKEN=${{ secrets.MY_GITHUB_PAT }}
           EOF
+          mkdir -p Bora/.ask
           cat > Bora/ask-resources.json << EOF
           {
             "askcliResourcesVersion": "2020-03-31",
@@ -84,12 +85,23 @@ jobs:
             }
           }
           EOF
+          cat > Bora/.ask/ask-states.json << EOF
+          {
+            "askcliStatesVersion": "2020-03-31",
+            "profiles": {
+              "default": {
+                "skillId": "amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07"
+              }
+            }
+          }
+          EOF
 
       - name: Populate .env for Finances
         run: |
           cat > Finances/lambda/.env << EOF
           GITHUB_TOKEN=${{ secrets.MY_GITHUB_PAT }}
           EOF
+          mkdir -p Finances/.ask
           cat > Finances/ask-resources.json << EOF
           {
             "askcliResourcesVersion": "2020-03-31",
@@ -99,6 +111,16 @@ jobs:
                 "skillInfrastructure": {
                   "type": "@ask-cli/hosted-skill-deployer"
                 }
+              }
+            }
+          }
+          EOF
+          cat > Finances/.ask/ask-states.json << EOF
+          {
+            "askcliStatesVersion": "2020-03-31",
+            "profiles": {
+              "default": {
+                "skillId": "amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3"
               }
             }
           }
