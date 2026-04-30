@@ -150,6 +150,9 @@ jobs:
           echo "### 🚀 Set and Build Bora Interaction Model"
           ask smapi set-interaction-model --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 --stage development --locale pt-BR --interaction-model "$(cat skill-package/interactionModels/custom/pt-BR.json)"
 
+          echo "### 🏗️ Forcing Skill Build (Lambda Deployment)"
+          ask smapi submit-skill-validation --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 --stage development --locales pt-BR || echo "Validation triggered"
+
       - name: Deploy Finances
         if: github.event.inputs.deploy_finances == 'true'
         run: |
@@ -173,3 +176,6 @@ jobs:
 
           echo "### 🚀 Set and Build Finances Interaction Model"
           ask smapi set-interaction-model --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 --stage development --locale pt-BR --interaction-model "$(cat skill-package/interactionModels/custom/pt-BR.json)"
+
+          echo "### 🏗️ Forcing Skill Build (Lambda Deployment)"
+          ask smapi submit-skill-validation --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 --stage development --locales pt-BR || echo "Validation triggered"
