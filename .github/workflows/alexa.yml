@@ -141,11 +141,24 @@ jobs:
           REPO_URL=$(ask smapi get-alexa-hosted-skill-metadata --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 | jq -r '.alexaHosted.repository.url')
           REPO_URL=$(echo "$REPO_URL" | tr -d '`' | xargs)
           git remote add ask "$REPO_URL"
-          git config credential.helper '!f() { ask util git-credentials-helper --profile default "$@"; }; f'
+          git config credential.helper "!ask util git-credentials-helper --profile default"
           git add .
           git commit -m "Deploy Bora via GitHub Actions" || echo "No changes to commit"
           git push ask master --force
           git push ask master:dev --force
+
+      - name: Verify Bora Final Intent In Remote Model
+        if: github.event.inputs.deploy_bora == 'true'
+        run: |
+          for i in {1..10}; do
+            ask smapi get-interaction-model --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 --stage development --locale pt-BR > /tmp/bora-model.json
+            if jq -e '.interactionModel.languageModel.intents[] | select(.name=="PlayAutoplagioFinalIntent")' /tmp/bora-model.json >/dev/null; then
+              break
+            fi
+            sleep 10
+          done
+          jq -e '.interactionModel.languageModel.intents[] | select(.name=="PlayAutoplagioFinalIntent")' /tmp/bora-model.json >/dev/null
+          echo "PlayAutoplagioFinalIntent found in remote model."
 
       - name: Deploy Finances
         if: github.event.inputs.deploy_finances == 'true'
@@ -162,7 +175,7 @@ jobs:
           REPO_URL=$(ask smapi get-alexa-hosted-skill-metadata --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 | jq -r '.alexaHosted.repository.url')
           REPO_URL=$(echo "$REPO_URL" | tr -d '`' | xargs)
           git remote add ask "$REPO_URL"
-          git config credential.helper '!f() { ask util git-credentials-helper --profile default "$@"; }; f'
+          git config credential.helper "!ask util git-credentials-helper --profile default"
           git add .
           git commit -m "Deploy Finances via GitHub Actions" || echo "No changes to commit"
           git push ask master --force
