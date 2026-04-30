@@ -4,15 +4,30 @@ on:
   workflow_dispatch:
     inputs:
       deploy_bora:
-        description: 'Fazer deploy da skill Bora?'
+        description: '🚀 Deploy Bora?'
         required: true
         type: boolean
         default: true
       deploy_finances:
-        description: 'Fazer deploy da skill Finances?'
+        description: '💰 Deploy Finances?'
         required: true
         type: boolean
         default: true
+      build_model:
+        description: '🗣️ Build Interaction Model?'
+        required: true
+        type: boolean
+        default: true
+      force_validation:
+        description: '🏗️ Force Skill Validation?'
+        required: true
+        type: boolean
+        default: false
+      debug_mode:
+        description: '🐞 Enable Debug Mode?'
+        required: true
+        type: boolean
+        default: false
 
 env:
   ASK_VERSION: '2.30.7'
@@ -147,11 +162,18 @@ jobs:
           git push ask master --force
           git push ask master:dev --force
 
-          echo "### 🚀 Set and Build Bora Interaction Model"
-          ask smapi set-interaction-model --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 --stage development --locale pt-BR --interaction-model "$(cat skill-package/interactionModels/custom/pt-BR.json)"
+          if [[ "${{ github.event.inputs.build_model }}" == "true" ]]; then
+            echo "### 🚀 Set and Build Bora Interaction Model"
+            ask smapi set-interaction-model --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 --stage development --locale pt-BR --interaction-model "$(cat skill-package/interactionModels/custom/pt-BR.json)"
+          fi
 
-          echo "### 🏗️ Forcing Skill Build (Lambda Deployment)"
-          ask smapi submit-skill-validation --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 --stage development --locales pt-BR || echo "Validation triggered"
+          if [[ "${{ github.event.inputs.force_validation }}" == "true" ]]; then
+            echo "### 🏗️ Forcing Skill Build (Lambda Deployment)"
+            ask smapi submit-skill-validation --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 --stage development --locales pt-BR || echo "Validation triggered"
+          fi
+
+          echo "### 🚀 Final Deploy Attempt via ASK CLI"
+          ask deploy --ignore-hash --debug || echo "Ask deploy finished"
 
       - name: Deploy Finances
         if: github.event.inputs.deploy_finances == 'true'
@@ -174,8 +196,15 @@ jobs:
           git push ask master --force
           git push ask master:dev --force
 
-          echo "### 🚀 Set and Build Finances Interaction Model"
-          ask smapi set-interaction-model --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 --stage development --locale pt-BR --interaction-model "$(cat skill-package/interactionModels/custom/pt-BR.json)"
+          if [[ "${{ github.event.inputs.build_model }}" == "true" ]]; then
+            echo "### 🚀 Set and Build Finances Interaction Model"
+            ask smapi set-interaction-model --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 --stage development --locale pt-BR --interaction-model "$(cat skill-package/interactionModels/custom/pt-BR.json)"
+          fi
 
-          echo "### 🏗️ Forcing Skill Build (Lambda Deployment)"
-          ask smapi submit-skill-validation --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 --stage development --locales pt-BR || echo "Validation triggered"
+          if [[ "${{ github.event.inputs.force_validation }}" == "true" ]]; then
+            echo "### 🏗️ Forcing Skill Build (Lambda Deployment)"
+            ask smapi submit-skill-validation --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 --stage development --locales pt-BR || echo "Validation triggered"
+          fi
+
+          echo "### 🚀 Final Deploy Attempt via ASK CLI"
+          ask deploy --ignore-hash --debug || echo "Ask deploy finished"
