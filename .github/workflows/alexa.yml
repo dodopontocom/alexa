@@ -113,7 +113,7 @@ jobs:
           git init
           REPO_URL=$(ask smapi get-alexa-hosted-skill-metadata --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 | jq -r '.alexaHosted.repository.url')
           git remote add ask "$REPO_URL"
-          git config --global credential.helper "!ask util git-credentials-helper"
+          git config credential.helper "!f() { ask util git-credentials-helper --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 \"\$@\"; }; f"
           git add .
           git commit -m "Deploy via GitHub Actions"
           git push ask master --force
@@ -127,7 +127,7 @@ jobs:
           git init
           REPO_URL=$(ask smapi get-alexa-hosted-skill-metadata --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 | jq -r '.alexaHosted.repository.url')
           git remote add ask "$REPO_URL"
-          git config --global credential.helper "!ask util git-credentials-helper"
+          git config credential.helper "!f() { ask util git-credentials-helper --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 \"\$@\"; }; f"
           git add .
           git commit -m "Deploy via GitHub Actions"
           git push ask master --force
