@@ -68,6 +68,33 @@ jobs:
         if: github.event.inputs.deploy_bora == 'true'
         run: |
           cd Bora
+
+          # Criar arquivos de recursos no caminho correto
+          cat > ask-resources.json << EOF
+          {
+            "askcliResourcesVersion": "2020-03-31",
+            "profiles": {
+              "default": {
+                "skillId": "amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07",
+                "skillInfrastructure": {
+                  "type": "@ask-cli/hosted-skill-deployer"
+                }
+              }
+            }
+          }
+          EOF
+
+          cat > ask-states.json << EOF
+          {
+            "askcliStatesVersion": "2020-03-31",
+            "profiles": {
+              "default": {
+                "skillId": "amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07"
+              }
+            }
+          }
+          EOF
+
           git init -b master
           git config user.email "workflow@github.actions"
           git config user.name "Github Workflow"
@@ -113,6 +140,33 @@ jobs:
         if: github.event.inputs.deploy_finances == 'true'
         run: |
           cd Finances
+
+          # Criar arquivos de recursos no caminho correto
+          cat > ask-resources.json << EOF
+          {
+            "askcliResourcesVersion": "2020-03-31",
+            "profiles": {
+              "default": {
+                "skillId": "amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3",
+                "skillInfrastructure": {
+                  "type": "@ask-cli/hosted-skill-deployer"
+                }
+              }
+            }
+          }
+          EOF
+
+          cat > ask-states.json << EOF
+          {
+            "askcliStatesVersion": "2020-03-31",
+            "profiles": {
+              "default": {
+                "skillId": "amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3"
+              }
+            }
+          }
+          EOF
+
           git init -b master
           git config user.email "workflow@github.actions"
           git config user.name "Github Workflow"

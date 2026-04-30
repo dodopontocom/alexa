@@ -1,0 +1,9 @@
+{
+  "askcliStatesVersion": "2020-03-31",
+  "profiles": {
+    "default": {
+      "skillId": "amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07",
+      "deploymentStatus": "IN_PROGRESS"
+    }
+  }
+}
