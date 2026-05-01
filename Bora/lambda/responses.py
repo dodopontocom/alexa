@@ -144,7 +144,7 @@ def gerar_ssml_ultra_tatico(texto):
             "<voice name='Thiago'>"
                 "<prosody pitch='-15%' rate='115%' volume='loud'>"
                     "<say-as interpret-as='interjection'>entendido</say-as>. "
-                    f"{texto_formatado}"
+                    + texto_formatado +
                     "<say-as interpret-as='interjection'>câmbio</say-as>."
                 "</prosody>"
             "</voice>"
