@@ -139,15 +139,14 @@ def gerar_ssml_ultra_tatico(texto):
         if i < len(frases) - 1:
             texto_formatado += '<break time="300ms"/>'
 
+    # Montagem final limpa e segura
     ssml = (
         "<speak>"
-            "<voice name='Thiago'>"
-                "<prosody pitch='-15%' rate='115%' volume='loud'>"
-                    "<say-as interpret-as='interjection'>entendido</say-as>. "
-                    + texto_formatado +
-                    "<say-as interpret-as='interjection'>câmbio</say-as>."
-                "</prosody>"
-            "</voice>"
+        "<voice name='Thiago'>"
+        "<prosody pitch='-15%' rate='115%' volume='loud'>"
+        f"{texto_formatado}"
+        "</prosody>"
+        "</voice>"
         "</speak>"
     )
     return ssml

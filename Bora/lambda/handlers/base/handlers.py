@@ -14,10 +14,11 @@ class LaunchRequestHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         texto = "Modo Secreto ativado. Sistema pronto para extração de dados e suporte tático. O que mais você precisa, comandante?"
         speak_output = gerar_ssml_ultra_tatico(texto)
+        logger.info(f"=== SSML GERADO: {speak_output} ===")
         return (
             handler_input.response_builder
                 .speak(speak_output)
-                .ask("Aguardando ordens, câmbio.")
+                .ask("Aguardando ordens.")
                 .response
         )
 
