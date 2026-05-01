@@ -3,6 +3,7 @@ import os
 import json
 import subprocess
 from pathlib import Path
+from datetime import datetime
 
 app = Flask(__name__, static_folder='static')
 
@@ -39,39 +40,52 @@ def get_model(skill_name):
     with open(paths["model"], 'r', encoding='utf-8') as f:
         return jsonify(json.load(f))
 
+def validate_model(model_data):
+    """Lint simples para o modelo da Alexa"""
+    try:
+        # Verifica estrutura básica
+        im = model_data.get("interactionModel", {})
+        lm = im.get("languageModel", {})
+        if not lm.get("intents") or not lm.get("invocationName"):
+            return False, "Modelo inválido: 'intents' ou 'invocationName' ausentes."
+        
+        # Verifica se invocation name segue regras básicas (ex: sem letras maiúsculas)
+        inv_name = lm.get("invocationName")
+        if any(c.isupper() for c in inv_name):
+            return False, "Erro de Lint: 'invocationName' deve ser minúsculo."
+            
+        return True, "Validado"
+    except Exception as e:
+        return False, str(e)
+
 @app.route('/api/skill/<skill_name>/model', methods=['POST'])
 def update_model(skill_name):
-    paths = get_skill_paths(skill_name)
-    if not paths:
-        return jsonify({"error": "Skill not found"}), 404
-    
-    new_model = request.json
-    
-    # Salvar arquivo
-    with open(paths["model"], 'w', encoding='utf-8') as f:
-        json.dump(new_model, f, indent=2, ensure_ascii=False)
-    
-    # Git operations
     try:
-        # Pega a branch atual ou usa uma padrão que o workflow monitore
-        # O workflow atual monitora chore/*
-        branch_name = "chore/skill-update"
+        paths = get_skill_paths(skill_name)
+        if not paths:
+            return jsonify({"error": "Skill not found"}), 404
         
-        # Check if branch exists
-        res = subprocess.run(["git", "rev-parse", "--verify", branch_name], capture_output=True, cwd=str(BASE_DIR))
-        if res.returncode != 0:
-            subprocess.run(["git", "checkout", "-b", branch_name], cwd=str(BASE_DIR))
-        else:
-            subprocess.run(["git", "checkout", branch_name], cwd=str(BASE_DIR))
+        new_model = request.json
+        
+        # Lint
+        is_valid, message = validate_model(new_model)
+        if not is_valid:
+            return jsonify({"error": message}), 400
 
-        subprocess.run(["git", "add", str(paths["model"])], cwd=str(BASE_DIR))
-        commit_msg = f"Update {skill_name} interaction model via Web Editor"
-        subprocess.run(["git", "commit", "-m", commit_msg], cwd=str(BASE_DIR))
+        # Git: Criar branch com timestamp
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        branch_name = f"chore/skill-update-{timestamp}"
+        subprocess.run(["git", "checkout", "-b", branch_name], cwd=str(BASE_DIR))
+
+        # Salvar arquivo
+        with open(paths["model"], 'w', encoding='utf-8') as f:
+            json.dump(new_model, f, indent=2, ensure_ascii=False)
         
-        # Push para disparar workflow
-        subprocess.run(["git", "push", "origin", branch_name], cwd=str(BASE_DIR))
-        
-        return jsonify({"message": "Model updated and pushed to GitHub!"})
+        return jsonify({
+            "message": f"Branch '{branch_name}' criada e arquivo salvo. Verifique com 'git status'.",
+            "branch": branch_name,
+            "path": str(paths["model"])
+        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
