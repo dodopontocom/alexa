@@ -111,6 +111,47 @@ REPROMPTS_HABILIDADES = [
     "Posso te mostrar como funciona o BoraIntent."
 ]
 
+def gerar_ssml_ultra_tatico(texto):
+    """
+    Gera SSML com controle avançado de prosódia para tom tático/militar.
+    Voz: Thiago (Neural)
+    Efeitos: Pitch grave (-15%), Rate acelerado (115%), Volume alto (loud), 
+             Ênfase forte e interjeições técnicas.
+    """
+    # Exemplo de entrada: 'Sistema hackeado. Todos os dados foram extraídos com sucesso. O que mais você precisa, comandante?'
+    
+    # Processamento para adicionar quebras e ênfase
+    frases = texto.split('. ')
+    texto_formatado = ""
+    
+    for i, frase in enumerate(frases):
+        if "?" in frase:
+            texto_formatado += f"{frase} "
+        else:
+            # Aplica ênfase em palavras importantes (heurística simples para o exemplo)
+            for palavra in ["hackeado", "extraídos", "sucesso"]:
+                if palavra in frase:
+                    frase = frase.replace(palavra, f'<emphasis level="strong">{palavra}</emphasis>')
+            
+            texto_formatado += f"{frase}. "
+            
+        # Adiciona break de rádio entre frases, exceto na última
+        if i < len(frases) - 1:
+            texto_formatado += '<break time="300ms"/>'
+
+    ssml = (
+        "<speak>"
+            "<voice name='Thiago'>"
+                "<prosody pitch='-15%' rate='115%' volume='loud'>"
+                    "<say-as interpret-as='interjection'>entendido</say-as>. "
+                    f"{texto_formatado}"
+                    "<say-as interpret-as='interjection'>câmbio</say-as>."
+                "</prosody>"
+            "</voice>"
+        "</speak>"
+    )
+    return ssml
+
 REPROMPTS_MOTIVACAO = [
     "Agora que estamos motivados, quer explorar o que eu sei fazer?",
     "Bora agir? Posso listar minhas funções para você se quiser.",

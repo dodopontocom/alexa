@@ -2,6 +2,7 @@
 import logging
 import ask_sdk_core.utils as ask_utils
 from ask_sdk_core.dispatch_components import AbstractRequestHandler, AbstractExceptionHandler
+from responses import gerar_ssml_ultra_tatico
 
 logger = logging.getLogger(__name__)
 
@@ -11,11 +12,12 @@ class LaunchRequestHandler(AbstractRequestHandler):
         return ask_utils.is_request_type("LaunchRequest")(handler_input)
 
     def handle(self, handler_input):
-        speak_output = '<speak><voice name="Ricardo">Modo Secreto, já sabe o que dizer.</voice></speak>'
+        texto = "Modo Secreto ativado. Sistema pronto para extração de dados e suporte tático. O que mais você precisa, comandante?"
+        speak_output = gerar_ssml_ultra_tatico(texto)
         return (
             handler_input.response_builder
                 .speak(speak_output)
-                .ask("O que você gostaria de fazer agora?")
+                .ask("Aguardando ordens, câmbio.")
                 .response
         )
 

@@ -97,3 +97,31 @@ def get_sarcastic_whisper_response(mensagem):
 
 ---
 *Manual técnico de referência para Design de Voz Alexa PT-BR.*
+
+## 7. Exemplo Ultra Tático (Thiago)
+
+Abaixo, um exemplo de como o SSML tático é construído para a voz do Thiago, focando em autoridade e clareza militar.
+
+### SSML Gerado
+```xml
+<speak>
+    <voice name="Thiago">
+        <prosody pitch="-15%" rate="115%" volume="loud">
+            <say-as interpret-as="interjection">entendido</say-as>. 
+            Sistema <emphasis level="strong">hackeado</emphasis>. 
+            <break time="300ms"/>
+            Todos os dados foram <emphasis level="strong">extraídos</emphasis> com <emphasis level="strong">sucesso</emphasis>. 
+            <break time="300ms"/>
+            O que mais você precisa, comandante?
+            <say-as interpret-as="interjection">câmbio</say-as>.
+        </prosody>
+    </voice>
+</speak>
+```
+
+### Características Técnicas
+- **Pitch (-15%)**: Confere uma voz mais grave e imponente.
+- **Rate (115%)**: Fala rápida e decisiva, típica de comunicações críticas.
+- **Volume (loud)**: Máxima clareza para ambientes com ruído ou Echo Dots pequenos.
+- **Breaks (300ms)**: Simula a cadência de rádio/satélite entre frases.
+- **Emphasis (strong)**: Destaca os termos de ação e status.
