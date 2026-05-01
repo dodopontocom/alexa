@@ -31,15 +31,14 @@
           "samples": []
         },
         {
-          "slots": [],
           "name": "PlayAutoplagioIntent",
           "samples": [
             "tocar a música autoral",
             "toque a música autoral",
             "tocar música autoral",
-            "tocar autoplágio",
-            "tocar eu vou roubar"
-          ]
+            "tocar autoplágio"
+          ],
+          "slots": []
         },
         {
           "name": "PlayAutoplagioFinalIntent",
@@ -52,44 +51,44 @@
           ]
         },
         {
-          "slots": [
-            {
-              "name": "transacao",
-              "type": "AMAZON.SearchQuery"
-            }
-          ],
           "name": "ChatFinancesIntent",
           "samples": [
             "adicionar {transacao}",
             "comprei {transacao}",
             "recebi {transacao}"
+          ],
+          "slots": [
+            {
+              "name": "transacao",
+              "type": "AMAZON.SearchQuery"
+            }
           ]
         },
         {
+          "name": "ReportIssueIntent",
+          "samples": [
+            "o cliente {relato}"
+          ],
           "slots": [
             {
               "name": "relato",
               "type": "AMAZON.SearchQuery"
             }
-          ],
-          "name": "ReportIssueIntent",
-          "samples": [
-            "o cliente {relato}"
           ]
         },
         {
-          "slots": [],
           "name": "ClosedIssuesCountIntent",
           "samples": [
             "me mostre o ranking",
             "qual é o ranking dos desenvolvedores",
             "quem está na liderança",
             "me diga o top três"
-          ]
+          ],
+          "slots": []
         }
       ],
-      "types": [],
-      "invocationName": "modo secreto"
+      "invocationName": "modo secreto",
+      "types": []
     }
   }
 }
