@@ -32,6 +32,7 @@ from handlers.custom.music import PlayAutoplagioIntentHandler, PlayAutoplagioFin
 from handlers.custom.chatia import ChatFinancesIntentHandler
 from handlers.custom.github import ReportIssueIntentHandler
 from handlers.custom.issueleader import ClosedIssuesCountIntentHandler
+from handlers.custom.bora_handler import BoraIntentHandler
 
 # Configurar logging mais detalhado
 logging.basicConfig(level=logging.DEBUG)
@@ -49,6 +50,7 @@ sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
 
 # CUSTOMS AQUI
+sb.add_request_handler(BoraIntentHandler())
 sb.add_request_handler(PlayAutoplagioIntentHandler())
 sb.add_request_handler(ChatFinancesIntentHandler())
 sb.add_request_handler(ReportIssueIntentHandler())

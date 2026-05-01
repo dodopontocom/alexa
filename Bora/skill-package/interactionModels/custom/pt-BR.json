@@ -3,6 +3,15 @@
     "languageModel": {
       "intents": [
         {
+          "slots": [],
+          "name": "BoraIntent",
+          "samples": [
+            "bora lá",
+            "vamos começar",
+            "partiu"
+          ]
+        },
+        {
           "name": "AMAZON.CancelIntent",
           "samples": []
         },
