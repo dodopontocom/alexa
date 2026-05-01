@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import requests
+import os
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
 from ask_sdk_core import utils as ask_utils
 
