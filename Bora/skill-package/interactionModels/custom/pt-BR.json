@@ -3,13 +3,23 @@
     "languageModel": {
       "intents": [
         {
-          "slots": [],
+          "slots": [
+            {
+              "name": "tipoPergunta",
+              "type": "TIPO_PERGUNTA"
+            }
+          ],
           "name": "BoraIntent",
           "samples": [
             "bora lá",
             "vamos começar",
             "partiu",
-            "modo bora"
+            "modo bora",
+            "quais são suas habilidades",
+            "o que você sabe fazer",
+            "me diga suas funções",
+            "me dê uma {tipoPergunta}",
+            "fale sobre {tipoPergunta}"
           ]
         },
         {
@@ -96,7 +106,33 @@
         }
       ],
       "invocationName": "modo secreto",
-      "types": []
+      "types": [
+        {
+          "name": "TIPO_PERGUNTA",
+          "values": [
+            {
+              "name": {
+                "value": "habilidades",
+                "synonyms": [
+                  "funções",
+                  "capacidades",
+                  "o que faz"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "motivação",
+                "synonyms": [
+                  "frase motivacional",
+                  "incentivo",
+                  "ânimo"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   }
 }
