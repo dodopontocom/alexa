@@ -1,6 +1,9 @@
 name: Alexa Skills
 
 on:
+  push:
+    branches:
+      - chore/*
   workflow_dispatch:
     inputs:
       deploy_bora:
