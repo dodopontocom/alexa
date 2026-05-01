@@ -3,216 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alexa Skill Editor</title>
+    <title>Alexa Skill Editor Modular</title>
     <style>
-        body { font-family: sans-serif; margin: 20px; background: #f4f4f9; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { color: #232f3e; }
-        .skill-selector { margin-bottom: 20px; }
-        select, button, input { padding: 10px; font-size: 16px; border-radius: 4px; border: 1px solid #ccc; }
-        button { cursor: pointer; background: #0073bb; color: white; border: none; }
+        body { font-family: sans-serif; margin: 0; background: #f4f4f9; display: flex; flex-direction: column; height: 100vh; }
+        header { background: #232f3e; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 250px; background: #fff; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
+        .content { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
+        
+        .tabs { display: flex; background: #eee; padding: 10px 10px 0; border-bottom: 1px solid #ddd; }
+        .tab { padding: 10px 20px; cursor: pointer; border: 1px solid transparent; border-bottom: none; border-radius: 5px 5px 0 0; }
+        .tab.active { background: white; border-color: #ddd; font-weight: bold; }
+
+        select, button, input, textarea { padding: 8px; font-size: 14px; border-radius: 4px; border: 1px solid #ccc; }
+        button { cursor: pointer; background: #0073bb; color: white; border: none; padding: 10px 15px; }
         button:hover { background: #005a91; }
-        button.delete { background: #d9534f; }
-        .intent-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 4px; position: relative; }
-        .intent-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .samples-list { margin-left: 20px; }
-        .sample-item { display: flex; gap: 10px; margin-bottom: 5px; }
-        .actions { margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
-        #status { margin-top: 10px; padding: 10px; border-radius: 4px; display: none; }
+        button.delete { background: #dc3545; }
+        
+        .list-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .list-item:hover { background: #f9f9f9; }
+        .list-item.selected { background: #e7f3ff; border-left: 4px solid #0073bb; }
+
+        .intent-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .intent-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
+        .samples-container { margin-top: 10px; }
+        .sample-row { display: flex; gap: 8px; margin-bottom: 5px; }
+        .sample-row input { flex: 1; }
+        .btn-small { padding: 4px 8px; font-size: 12px; }
+        .btn-add { background: #28a745; margin-top: 5px; }
+        .btn-remove { background: #dc3545; }
+        .section-title { font-size: 14px; font-weight: bold; color: #555; margin-top: 10px; display: block; }
+        
+        .code-editor { flex: 1; font-family: monospace; font-size: 14px; width: 100%; min-height: 400px; resize: none; border: 1px solid #ddd; padding: 10px; }
+        
+        #status { position: fixed; bottom: 20px; right: 20px; padding: 15px; border-radius: 4px; display: none; z-index: 2000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
         .success { background: #dff0d8; color: #3c763d; display: block !important; }
         .error { background: #f2dede; color: #a94442; display: block !important; }
-        .loading { opacity: 0.5; pointer-events: none; }
+        .loading { background: #d9edf7; color: #31708f; display: block !important; }
 
-        /* Modal Styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center; align-items: center;
-            z-index: 1000;
-        }
-        .modal {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        }
-        .modal h3 { margin-top: 0; color: #232f3e; }
-        .modal p { color: #666; line-height: 1.5; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal { background: white; padding: 30px; border-radius: 12px; max-width: 400px; text-align: center; }
         .modal-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-        .btn-confirm { background: #0073bb; color: white; }
-        .btn-cancel { background: #eee; color: #333; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Alexa Skill Editor</h1>
-        
-        <div class="skill-selector">
-            <label>Selecione a Skill:</label>
-            <select id="skillSelect">
-                <option value="">-- Selecione --</option>
+    <header>
+        <span>Alexa Skill Editor Modular</span>
+        <div>
+            <select id="skillSelect" onchange="loadSkill()">
+                <option value="">-- Skill --</option>
             </select>
-            <button onclick="loadSkill()">Carregar</button>
         </div>
+    </header>
 
-        <div id="editor" style="display:none;">
-            <div id="intentsContainer"></div>
-            <button onclick="addIntent()">+ Novo Intent</button>
+    <div class="tabs">
+        <div class="tab active" id="tabModel" onclick="switchTab('model')">Interaction Model</div>
+        <div class="tab" id="tabHandlers" onclick="switchTab('handlers')">Custom Handlers</div>
+    </div>
 
-            <div class="actions">
-                <button onclick="showConfirmModal()">Salvar Alterações</button>
-                <div id="status"></div>
-            </div>
+    <div class="main-layout">
+        <div class="sidebar" id="sidebar">
+            <!-- Dinâmico -->
+        </div>
+        <div class="content" id="mainContent">
+            <!-- Dinâmico -->
         </div>
     </div>
 
-    <!-- Modal de Confirmação -->
+    <div id="status"></div>
+
     <div id="confirmModal" class="modal-overlay">
         <div class="modal">
-            <h3>Salvar Alterações?</h3>
-            <p>Isso irá validar o JSON e sobrescrever o arquivo local. Você poderá revisar as mudanças com 'git diff' depois.</p>
+            <h3 id="modalTitle">Confirmar?</h3>
+            <p id="modalText">Isso fará o push para o GitHub.</p>
             <div class="modal-buttons">
-                <button class="btn-confirm" onclick="confirmSave()">Sim, salvar</button>
-                <button class="btn-cancel" onclick="hideConfirmModal()">Cancelar</button>
+                <button onclick="executeSave()">Confirmar</button>
+                <button style="background:#eee;color:#333" onclick="closeModal()">Cancelar</button>
             </div>
         </div>
     </div>
 
     <script>
+        let currentSkill = "";
+        let currentTab = "model";
         let currentModel = null;
-        const skillSelect = document.getElementById('skillSelect');
-        const editor = document.getElementById('editor');
-        const intentsContainer = document.getElementById('intentsContainer');
-        const statusDiv = document.getElementById('status');
-        const confirmModal = document.getElementById('confirmModal');
+        let currentHandlerFile = "";
+        let pendingSaveAction = null;
 
-        function showConfirmModal() {
-            confirmModal.style.display = 'flex';
-        }
-
-        function hideConfirmModal() {
-            confirmModal.style.display = 'none';
-        }
-
-        async function confirmSave() {
-            hideConfirmModal();
-            await saveChanges();
-        }
-
-        // Carregar lista de skills
-        fetch('/api/skills')
-            .then(r => r.json())
-            .then(skills => {
-                skills.forEach(s => {
-                    const opt = document.createElement('option');
-                    opt.value = s;
-                    opt.textContent = s;
-                    skillSelect.appendChild(opt);
-                });
+        // Init
+        fetch('/api/skills').then(r => r.json()).then(skills => {
+            const select = document.getElementById('skillSelect');
+            skills.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s; opt.textContent = s;
+                select.appendChild(opt);
             });
+        });
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+            refreshUI();
+        }
 
         async function loadSkill() {
-            const skill = skillSelect.value;
-            if (!skill) return;
-
-            const res = await fetch(`/api/skill/${skill}/model`);
+            currentSkill = document.getElementById('skillSelect').value;
+            if (!currentSkill) return;
+            
+            showStatus("Carregando...", "loading");
+            const res = await fetch(`/api/skill/${currentSkill}/model`);
             currentModel = await res.json();
-            renderIntents();
-            editor.style.display = 'block';
+            hideStatus();
+            refreshUI();
         }
 
-        function renderIntents() {
-            intentsContainer.innerHTML = '<h2>Intents</h2>';
-            const intents = currentModel.interactionModel.languageModel.intents;
+        async function refreshUI() {
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('mainContent');
+            sidebar.innerHTML = "";
+            content.innerHTML = "";
 
-            intents.forEach((intent, idx) => {
+            if (!currentSkill) return;
+
+            if (currentTab === "model") {
+                sidebar.innerHTML = '<div class="list-item selected">pt-BR.json</div>';
+                renderModelEditor(content);
+            } else {
+                const res = await fetch(`/api/skill/${currentSkill}/handlers`);
+                const files = await res.json();
+                files.forEach(f => {
+                    const item = document.createElement('div');
+                    item.className = `list-item ${f === currentHandlerFile ? 'selected' : ''}`;
+                    item.textContent = f;
+                    item.onclick = () => loadHandler(f);
+                    sidebar.appendChild(item);
+                });
+                if (currentHandlerFile) renderHandlerEditor(content);
+            }
+        }
+
+        function renderModelEditor(container) {
+            container.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2>Interaction Model (pt-BR)</h2>
+                    <button onclick="requestSave('model')">Salvar e Push GitHub</button>
+                </div>
+                <div id="intentsList"></div>
+                <button class="btn-add" style="padding:12px; width:100%" onclick="addIntent()">+ Novo Intent</button>
+            `;
+            const list = document.getElementById('intentsList');
+            currentModel.interactionModel.languageModel.intents.forEach((intent, idx) => {
                 const isAmazon = intent.name.startsWith('AMAZON.');
                 const card = document.createElement('div');
                 card.className = 'intent-card';
                 card.innerHTML = `
                     <div class="intent-header">
                         <strong>${intent.name}</strong>
-                        ${!isAmazon ? `<button class="delete" onclick="removeIntent(${idx})">Remover</button>` : '<em>(Built-in)</em>'}
+                        ${!isAmazon ? `<button class="btn-remove btn-small" onclick="removeIntent(${idx})">Remover Intent</button>` : '<em>(Built-in)</em>'}
                     </div>
                     ${!isAmazon ? `
-                        <div class="samples-list">
-                            <label>Samples:</label>
-                            <div id="samples-${idx}">
-                                ${intent.samples.map((s, sIdx) => `
-                                    <div class="sample-item">
-                                        <input type="text" value="${s}" onchange="updateSample(${idx}, ${sIdx}, this.value)">
-                                        <button onclick="removeSample(${idx}, ${sIdx})">x</button>
-                                    </div>
-                                `).join('')}
-                            </div>
-                            <button onclick="addSample(${idx})">+ Sample</button>
+                        <span class="section-title">Samples (Frases de exemplo):</span>
+                        <div class="samples-container" id="samples-${idx}">
+                            ${intent.samples.map((s, sIdx) => `
+                                <div class="sample-row">
+                                    <input type="text" value="${s}" onchange="updateSample(${idx}, ${sIdx}, this.value)">
+                                    <button class="btn-remove btn-small" onclick="removeSample(${idx}, ${sIdx})">x</button>
+                                </div>
+                            `).join('')}
                         </div>
+                        <button class="btn-add btn-small" onclick="addSample(${idx})">+ Adicionar Sample</button>
                     ` : ''}
                 `;
-                intentsContainer.appendChild(card);
+                list.appendChild(card);
             });
         }
 
+        // --- Model Actions ---
         function updateSample(intentIdx, sampleIdx, value) {
             currentModel.interactionModel.languageModel.intents[intentIdx].samples[sampleIdx] = value;
         }
 
         function addSample(intentIdx) {
             currentModel.interactionModel.languageModel.intents[intentIdx].samples.push("");
-            renderIntents();
+            refreshUI();
         }
 
         function removeSample(intentIdx, sampleIdx) {
             currentModel.interactionModel.languageModel.intents[intentIdx].samples.splice(sampleIdx, 1);
-            renderIntents();
+            refreshUI();
         }
 
+        async function loadHandler(file) {
+            currentHandlerFile = file;
+            const res = await fetch(`/api/skill/${currentSkill}/handler/${file}`);
+            const data = await res.json();
+            refreshUI();
+            setTimeout(() => {
+                document.getElementById('codeEditor').value = data.content;
+            }, 10);
+        }
+
+        function renderHandlerEditor(container) {
+            container.innerHTML = `
+                <h2>Editando: ${currentHandlerFile}</h2>
+                <textarea id="codeEditor" class="code-editor"></textarea>
+                <div style="margin-top:20px">
+                    <button onclick="requestSave('handler')">Validar, Salvar e Push</button>
+                </div>
+            `;
+        }
+
+        // Actions
         function addIntent() {
-            const name = prompt("Nome do novo Intent (ex: MeuNovoIntent):");
-            if (!name) return;
-            currentModel.interactionModel.languageModel.intents.push({
-                name: name,
-                samples: [],
-                slots: []
-            });
-            renderIntents();
+            const name = prompt("Nome do Intent:");
+            if (name) {
+                currentModel.interactionModel.languageModel.intents.push({ name, samples: [], slots: [] });
+                refreshUI();
+            }
         }
 
         function removeIntent(idx) {
             if (confirm("Remover intent?")) {
                 currentModel.interactionModel.languageModel.intents.splice(idx, 1);
-                renderIntents();
+                refreshUI();
             }
         }
 
-        async function saveChanges() {
-            const skill = skillSelect.value;
-            statusDiv.textContent = "Salvando e enviando para o GitHub...";
-            statusDiv.className = "loading";
+        function requestSave(type) {
+            pendingSaveAction = type;
+            document.getElementById('modalTitle').textContent = type === 'model' ? "Salvar Modelo?" : "Salvar Handler?";
+            document.getElementById('confirmModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('confirmModal').style.display = 'none'; }
+
+        async function executeSave() {
+            closeModal();
+            showStatus("Validando e Enviando...", "loading");
             
             try {
-                const res = await fetch(`/api/skill/${skill}/model`, {
+                let url, body;
+                if (pendingSaveAction === 'model') {
+                    url = `/api/skill/${currentSkill}/model`;
+                    body = JSON.stringify(currentModel);
+                } else {
+                    url = `/api/skill/${currentSkill}/handler/${currentHandlerFile}`;
+                    body = JSON.stringify({ content: document.getElementById('codeEditor').value });
+                }
+
+                const res = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(currentModel)
+                    body: body
                 });
                 const data = await res.json();
                 
-                if (res.ok) {
-                    statusDiv.textContent = data.message;
-                    statusDiv.className = "success";
-                } else {
-                    throw new Error(data.error);
-                }
-            } catch (err) {
-                statusDiv.textContent = "Erro: " + err.message;
-                statusDiv.className = "error";
+                if (res.ok) showStatus(data.message, "success");
+                else throw new Error(data.error);
+            } catch (e) {
+                showStatus(e.message, "error");
             }
         }
+
+        function showStatus(msg, type) {
+            const s = document.getElementById('status');
+            s.textContent = msg;
+            s.className = type;
+            if (type !== 'loading') setTimeout(hideStatus, 5000);
+        }
+        function hideStatus() { document.getElementById('status').style.display = 'none'; }
     </script>
 </body>
 </html>
