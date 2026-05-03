@@ -15,6 +15,7 @@ from ask_sdk_core.skill_builder import SkillBuilder
 from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_model import Response
 from ask_sdk_model.ui import SimpleCard
+from ask_sdk_core.dispatch_components import AbstractRequestInterceptor
 
 # Import handlers from the refactored package
 from handlers.base.handlers import (
@@ -39,17 +40,24 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+class LoggingRequestInterceptor(AbstractRequestInterceptor):
+    """Loga detalhes de todo request que chega na Skill."""
+    def process(self, handler_input):
+        request_type = handler_input.request_envelope.request.object_type
+        session_id = handler_input.request_envelope.session.session_id if handler_input.request_envelope.session else "N/A"
+        
+        if request_type == "IntentRequest":
+            intent_name = handler_input.request_envelope.request.intent.name
+            logger.info("=== REQUEST RECEBIDO: type=%s | intent=%s | session_id=%s ===", request_type, intent_name, session_id)
+        else:
+            logger.info("=== REQUEST RECEBIDO: type=%s | session_id=%s ===", request_type, session_id)
+
 # Adicionar logging de inicialização
 logger.info("=== INICIANDO SKILL BUILDER ===")
 
 sb = SkillBuilder()
-sb.add_request_handler(LaunchRequestHandler())
-sb.add_request_handler(HelpIntentHandler())
-sb.add_request_handler(CancelOrStopIntentHandler())
-sb.add_request_handler(FallbackIntentHandler())
-sb.add_request_handler(SessionEndedRequestHandler())
 
-# CUSTOMS AQUI
+# CUSTOMS PRIMEIRO (Evita interceptação por IntentReflectorHandler ou Fallback genérico)
 sb.add_request_handler(BoraIntentHandler())
 sb.add_request_handler(PlayAutoplagioIntentHandler())
 sb.add_request_handler(ChatFinancesIntentHandler())
@@ -57,6 +65,14 @@ sb.add_request_handler(ReportIssueIntentHandler())
 sb.add_request_handler(ClosedIssuesCountIntentHandler())
 sb.add_request_handler(PlayAutoplagioFinalIntentHandler())
 
+# BASE HANDLERS
+sb.add_request_handler(LaunchRequestHandler())
+sb.add_request_handler(HelpIntentHandler())
+sb.add_request_handler(CancelOrStopIntentHandler())
+sb.add_request_handler(FallbackIntentHandler())
+sb.add_request_handler(SessionEndedRequestHandler())
+
+sb.add_global_request_interceptor(LoggingRequestInterceptor())
 sb.add_request_handler(IntentReflectorHandler())
 sb.add_exception_handler(CatchAllExceptionHandler())
 

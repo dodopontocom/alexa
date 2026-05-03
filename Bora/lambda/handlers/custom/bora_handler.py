@@ -16,8 +16,9 @@ logger.setLevel(logging.DEBUG)
 class BoraIntentHandler(AbstractRequestHandler):
     """Handler evoluído para o BoraIntent usando slots e responses externo."""
     def can_handle(self, handler_input):
+        intent_name = ask_utils.get_intent_name(handler_input) if ask_utils.is_request_type("IntentRequest")(handler_input) else "N/A"
         is_bora = ask_utils.is_intent_name("BoraIntent")(handler_input)
-        logger.debug("BoraIntentHandler can_handle: %s", is_bora)
+        logger.debug("BoraIntentHandler can_handle: intent_recebido=%s | resultado=%s", intent_name, is_bora)
         return is_bora
 
     def handle(self, handler_input):
