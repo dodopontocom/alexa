@@ -57,7 +57,7 @@ logger.info("=== INICIANDO SKILL BUILDER ===")
 
 sb = SkillBuilder()
 
-# CUSTOMS PRIMEIRO (Evita interceptação por IntentReflectorHandler ou Fallback genérico)
+sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(BoraIntentHandler())
 sb.add_request_handler(PlayAutoplagioIntentHandler())
 sb.add_request_handler(ChatFinancesIntentHandler())
@@ -65,8 +65,6 @@ sb.add_request_handler(ReportIssueIntentHandler())
 sb.add_request_handler(ClosedIssuesCountIntentHandler())
 sb.add_request_handler(PlayAutoplagioFinalIntentHandler())
 
-# BASE HANDLERS
-sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
