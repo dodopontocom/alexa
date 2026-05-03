@@ -13,12 +13,17 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         texto = "Modo Secreto ativado. Sistema pronto para extração de dados e suporte tático. O que mais você precisa, comandante?"
+        reprompt_texto = "Estou aguardando ordens. O que deseja, comandante?"
+        
         speak_output = gerar_ssml_ultra_tatico(texto)
+        reprompt_output = gerar_ssml_ultra_tatico(reprompt_texto)
+        
         logger.info(f"=== SSML GERADO: {speak_output} ===")
         return (
             handler_input.response_builder
                 .speak(speak_output)
-                .ask("Aguardando ordens.")
+                .ask(reprompt_output)
+                .set_should_end_session(False)
                 .response
         )
 
@@ -66,8 +71,14 @@ class IntentReflectorHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         intent_name = ask_utils.get_intent_name(handler_input)
+        logger.warning("=== INTENT REFLECTOR ATIVADO: %s ===", intent_name)
         speak_output = f"Você acionou o intent {intent_name}."
-        return handler_input.response_builder.speak(speak_output).response
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .ask("O que mais você deseja fazer?")
+                .response
+        )
 
 
 class CatchAllExceptionHandler(AbstractExceptionHandler):
