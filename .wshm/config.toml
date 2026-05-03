@@ -1,0 +1,218 @@
+[github]
+# Token from env var GITHUB_TOKEN or WSHM_TOKEN, or `gh auth token` (never stored in config)
+
+[ai]
+provider = "anthropic"
+model = "claude-sonnet-4-20250514"
+# base_url = "https://custom-endpoint.example.com/v1/chat/completions"
+#
+# Supported providers:
+#   anthropic  → ANTHROPIC_API_KEY
+#   openai     → OPENAI_API_KEY
+#   google     → GOOGLE_API_KEY or GEMINI_API_KEY
+#   mistral    → MISTRAL_API_KEY
+#   groq       → GROQ_API_KEY
+#   deepseek   → DEEPSEEK_API_KEY
+#   xai        → XAI_API_KEY
+#   together   → TOGETHER_API_KEY
+#   fireworks  → FIREWORKS_API_KEY
+#   perplexity → PERPLEXITY_API_KEY
+#   cohere     → COHERE_API_KEY or CO_API_KEY
+#   openrouter → OPENROUTER_API_KEY
+#   ollama     → no key needed (local)
+#   azure      → AZURE_OPENAI_API_KEY + AZURE_OPENAI_ENDPOINT
+#   custom     → WSHM_AI_API_KEY + base_url
+
+[triage]
+enabled = true
+auto_fix = false
+auto_fix_confidence = 0.85
+# model = "claude-haiku-4-5-20251001"   # override: small model for triage
+labels_bug = "bug"
+labels_feature = "feature"
+labels_duplicate = "duplicate"
+labels_wontfix = "wontfix"
+labels_needs_info = "needs-info"
+# retriage_interval_hours = 24   # re-evaluate triaged issues every 24h (0 = disabled)
+
+[pr]
+enabled = true
+auto_label = true
+risk_labels = true
+# model = "claude-sonnet-4-20250514"    # override: default model for PR analysis
+
+[queue]
+enabled = true
+merge_threshold = 15
+strategy = "rebase"
+
+[conflicts]
+enabled = true
+auto_resolve = false
+auto_resolve_confidence = 0.85
+
+[sync]
+interval_minutes = 5
+full_sync_interval_hours = 24
+
+[fix]
+# model = "claude-sonnet-4-20250514"    # override: capable model for code generation
+# trusted_authors_only = true   # Only auto-fix issues from repo collaborators
+# allowed_users = ["alice", "bob"]  # Explicit whitelist (overrides trusted_authors_only)
+# scan_diff = true               # Scan generated code for suspicious patterns
+# draft_pr = true                # Create PRs as draft (require human review)
+# base_branch = "main"           # Base branch for fix PRs (e.g. "develop")
+
+# Labels that wshm must never apply (case-insensitive)
+# labels_blacklist = ["do-not-touch", "manual-only", "security"]
+
+# Issues/PRs that wshm must never touch
+# issues_blacklist = [755, 123]
+# prs_blacklist = [42]
+
+# Label definitions (fed to AI for better label selection)
+# [[labels]]
+# name = "bug"
+# description = "Something is broken or produces wrong results"
+# when = "Confirmed broken behavior with clear repro steps"
+#
+# [[labels]]
+# name = "enhancement"
+# description = "New feature or improvement request"
+# when = "Request for new capability, not a fix"
+#
+# [[labels]]
+# name = "priority:critical"
+# description = "Blocks users, data loss, security vulnerability"
+# when = "Production down, data corruption, or security exploit"
+#
+# [[labels]]
+# name = "priority:high"
+# description = "Major impact, needs attention soon"
+# when = "Core feature broken, no workaround"
+#
+# [[labels]]
+# name = "priority:medium"
+# description = "Moderate impact, can wait"
+# when = "Feature degraded but workaround exists"
+#
+# [[labels]]
+# name = "priority:low"
+# description = "Minor or cosmetic"
+# when = "Edge case or low-impact improvement"
+
+# [assign]
+# enabled = true
+#
+# [[assign.issues]]
+# user = "alice"
+# weight = 70
+#
+# [[assign.issues]]
+# user = "bob"
+# weight = 30
+#
+# [[assign.prs]]
+# user = "alice"
+# weight = 50
+#
+# [[assign.prs]]
+# user = "bob"
+# weight = 50
+
+# [update]
+# enabled = false                        # Enable automatic update checks in daemon mode
+# interval_hours = 6                     # Check interval
+# auto_apply = false                     # Auto-install updates (daemon uses true)
+
+# [branding]
+# name = "wshm"                       # Bot display name in comments
+# url = "https://github.com/wshm-dev/wshm"        # Link in comment footers
+# avatar_url = "https://example.com/logo.png"   # Optional avatar in headers
+# tagline = "AI-powered repo assistant"          # Optional tagline
+# command_prefix = "/wshm"             # Slash command prefix
+# footer_template = "*{action} by [{name}]({url})*"  # Custom footer
+#
+# Custom comment templates (markdown/HTML). Omit to use defaults.
+# Triage placeholders: {header}, {footer}, {category}, {priority}, {confidence},
+#   {summary}, {category_emoji}, {priority_emoji}, {relevant_files}, {duplicate_of}
+# triage_template = """
+# {header}
+# ## Triage Result
+# **{category_emoji} {category}** — {summary}
+# {footer}
+# """
+#
+# PR analysis placeholders: {header}, {footer}, {type}, {risk}, {summary},
+#   {type_emoji}, {risk_emoji}, {tests_present}, {breaking_change},
+#   {docs_updated}, {linked_issues}
+# pr_template = """
+# {header}
+# ## PR Review
+# **{type_emoji} {type}** | Risk: {risk_emoji} {risk}
+# {summary}
+# {footer}
+# """
+
+# [web]
+# enabled = true                        # Enable web dashboard on daemon port
+# username = "admin"                    # Basic auth username
+# password = "changeme"                # Basic auth password (or auto-generated in .wshm/credentials)
+
+# [license]
+# Resolution order: vault → env WSHM_LICENSE_KEY → path → ~/.wshm/license.jwt
+#
+# key = "vault(secret/wshm/license-key)"               # HashiCorp Vault
+# key = "vault(wshm/license-key)"                       # AWS Secrets Manager
+# key = "vault(wshm-keyvault/license-key)"              # Azure Key Vault
+# key = "vault(projects/my-proj/secrets/wshm-license)"  # GCP Secret Manager
+#
+# path = "~/.wshm/license.jwt"         # Explicit path to cached JWT
+#
+# Or use env var: WSHM_LICENSE_KEY=WSHM-XXXX-XXXX-XXXX
+
+# [vault]
+# provider = "hashicorp"               # "hashicorp" | "aws" | "azure" | "gcp"
+# address = "https://vault.example.com"
+# mount = "secret"
+# Auth from env: VAULT_TOKEN, VAULT_ROLE_ID, etc.
+
+# [notify]
+# on_run = true                         # Send summary after `wshm run`
+#
+# [[notify.discord]]
+# url = "https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN"
+# username = "wshm"
+# avatar_url = "https://github.com/wshm-dev.png"
+#
+# [[notify.slack]]
+# url = "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+# channel = "repo-updates"
+# username = "wshm"
+#
+# [[notify.teams]]
+# url = "https://outlook.office.com/webhook/YOUR/WEBHOOK/URL"
+#
+# [[notify.webhooks]]
+# url = "https://your-server.com/wshm-notify"
+# secret = "hmac-secret"
+
+# [export.storage]
+# provider = "s3"                      # "s3" | "azure" | "gcs"
+# bucket = "wshm-logs"
+# prefix = "repos/{repo}/"
+# region = "eu-west-1"
+
+# [export.database]
+# provider = "elasticsearch"           # "elasticsearch" | "opensearch" | "postgresql" | "mongodb" | "mysql" | "mariadb"
+# uri = "http://localhost:9200"        # or vault(secret/wshm/elastic-uri)
+# index = "wshm-events"
+
+# [[export.webhooks]]
+# url = "https://hooks.example.com/wshm"
+# events = ["FixApplied", "PrMerged"]
+# secret = "your-hmac-secret"          # or vault(secret/wshm/webhook-hmac)
+
+# [[export.webhooks]]
+# url = "https://slack.example.com/webhook"
+# events = ["*"]
