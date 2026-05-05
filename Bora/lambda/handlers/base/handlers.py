@@ -12,20 +12,25 @@ class LaunchRequestHandler(AbstractRequestHandler):
         return ask_utils.is_request_type("LaunchRequest")(handler_input)
 
     def handle(self, handler_input):
-        texto = "Modo Secreto ativado. Sistema pronto para extração de dados e suporte tático. O que mais você precisa, comandante?"
-        reprompt_texto = "Estou aguardando ordens. O que deseja, comandante?"
-        
-        speak_output = gerar_ssml_ultra_tatico(texto)
-        reprompt_output = gerar_ssml_ultra_tatico(reprompt_texto)
-        
-        logger.info(f"=== SSML GERADO: {speak_output} ===")
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                .ask(reprompt_output)
-                .set_should_end_session(False)
-                .response
-        )
+        logger.info("=== EXECUTANDO LAUNCH REQUEST HANDLER ===")
+        try:
+            texto = "Modo Secreto ativado. Sistema pronto. O que deseja, comandante?"
+            reprompt_texto = "Aguardando ordens."
+            
+            speak_output = gerar_ssml_ultra_tatico(texto)
+            reprompt_output = gerar_ssml_ultra_tatico(reprompt_texto)
+            
+            logger.info(f"=== SSML GERADO COM SUCESSO ===")
+            return (
+                handler_input.response_builder
+                    .speak(speak_output)
+                    .ask(reprompt_output)
+                    .set_should_end_session(False)
+                    .response
+            )
+        except Exception as e:
+            logger.error(f"Erro no LaunchRequestHandler: {str(e)}", exc_info=True)
+            raise e
 
 
 class HelpIntentHandler(AbstractRequestHandler):
@@ -62,6 +67,9 @@ class SessionEndedRequestHandler(AbstractRequestHandler):
         return ask_utils.is_request_type("SessionEndedRequest")(handler_input)
 
     def handle(self, handler_input):
+        reason = handler_input.request_envelope.request.reason
+        error = handler_input.request_envelope.request.error
+        logger.info(f"=== SESSÃO ENCERRADA: motivo={reason} | erro={error} ===")
         return handler_input.response_builder.response
 
 
@@ -86,10 +94,12 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
         return True
 
     def handle(self, handler_input, exception):
-        logger.error("=== EXCEPTION HANDLER ATIVADO ===")
-        logger.error(f"Tipo da exceção: {type(exception).__name__}")
-        logger.error(f"Mensagem da exceção: {str(exception)}")
-        logger.error("Stacktrace completo:", exc_info=True)
+        logger.error("=== EXCEPTION HANDLER ATIVADO ===", exc_info=True)
+        logger.error(f"Tipo: {type(exception).__name__} | Mensagem: {str(exception)}")
         
-        speak_output = '<speak><voice name="Ricardo">Desculpe, tive um problema ao processar sua solicitação. Tente novamente.</voice></speak>'
+        # Log do request que causou a falha
+        request_type = handler_input.request_envelope.request.object_type
+        logger.error(f"Request Type que falhou: {request_type}")
+        
+        speak_output = "Desculpe, comandante. Tive um erro interno no sistema tático. Tente novamente."
         return handler_input.response_builder.speak(speak_output).ask(speak_output).response

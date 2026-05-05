@@ -143,7 +143,7 @@ def gerar_ssml_ultra_tatico(texto):
     ssml = (
         "<speak>"
         "<voice name='Thiago'>"
-        "<prosody pitch='-15%' rate='115%' volume='loud'>"
+        "<prosody pitch='-5%' rate='100%' volume='loud'>"
         f"{texto_formatado}"
         "</prosody>"
         "</voice>"

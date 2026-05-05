@@ -57,10 +57,13 @@ logger.info("=== INICIANDO SKILL BUILDER ===")
 
 sb = SkillBuilder()
 
-# 1. LaunchRequest
+# 1. Interceptors (Primeiro para logar tudo)
+sb.add_global_request_interceptor(LoggingRequestInterceptor())
+
+# 2. LaunchRequest
 sb.add_request_handler(LaunchRequestHandler())
 
-# 2. Custom Intents (Prioridade sobre o Reflector)
+# 3. Custom Intents
 sb.add_request_handler(BoraIntentHandler())
 sb.add_request_handler(PlayAutoplagioIntentHandler())
 sb.add_request_handler(ChatFinancesIntentHandler())
@@ -68,14 +71,13 @@ sb.add_request_handler(ReportIssueIntentHandler())
 sb.add_request_handler(ClosedIssuesCountIntentHandler())
 sb.add_request_handler(PlayAutoplagioFinalIntentHandler())
 
-# 3. Base Handlers
+# 4. Base Handlers
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
 
-# 4. Interceptors e Handlers Genéricos (Sempre por último)
-sb.add_global_request_interceptor(LoggingRequestInterceptor())
+# 5. Handlers Genéricos e Exceção
 sb.add_request_handler(IntentReflectorHandler())
 sb.add_exception_handler(CatchAllExceptionHandler())
 
