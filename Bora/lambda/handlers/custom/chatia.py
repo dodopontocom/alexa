@@ -43,8 +43,8 @@ class ChatFinancesIntentHandler(AbstractRequestHandler):
             
             return (
                 handler_input.response_builder
-                    .speak(f'<speak><voice name="Ricardo">{ia_response}</voice></speak>')
-                    .ask(f'<speak><voice name="Ricardo">Quer adicionar outra transação?</voice></speak>')
+                    .speak(ia_response)
+                    .ask("Quer adicionar outra transação?")
                     .response
             )
 

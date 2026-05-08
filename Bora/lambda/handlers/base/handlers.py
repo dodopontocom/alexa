@@ -14,7 +14,7 @@ class LaunchRequestHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         logger.info("=== EXECUTANDO LAUNCH REQUEST HANDLER ===")
         try:
-            texto = "Modo Secreto ativado. Sistema pronto. O que deseja, comandante?"
+            texto = "Modo Secreto ativado. Sistema pronto. O que deseja, comandante."
             reprompt_texto = "Aguardando ordens."
             
             speak_output = gerar_ssml_ultra_tatico(texto)
@@ -57,8 +57,8 @@ class FallbackIntentHandler(AbstractRequestHandler):
         return ask_utils.is_intent_name("AMAZON.FallbackIntent")(handler_input)
 
     def handle(self, handler_input):
-        speech = '<speak><voice name="Ricardo">Hmm, não entendi. Você pode dizer olá ou pedir ajuda. O que você gostaria?</voice></speak>'
-        reprompt = '<speak><voice name="Ricardo">Desculpe, não entendi. Pode repetir?</voice></speak>'
+        speech = "Hmm, não entendi. Você pode dizer olá ou pedir ajuda. O que você gostaria?"
+        reprompt = "Desculpe, não entendi. Pode repetir?"
         return handler_input.response_builder.speak(speech).ask(reprompt).response
 
 

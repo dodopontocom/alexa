@@ -113,17 +113,9 @@ REPROMPTS_HABILIDADES = [
 
 def gerar_ssml_ultra_tatico(texto):
     """
-    Versão simplificada para garantir compatibilidade.
-    Usa voz padrão do sistema para evitar erros de voz neural.
+    Retorna o texto simples para voz padrão da Alexa.
     """
-    frases = texto.split('. ')
-    texto_formatado = " ".join([f"{f}." for f in frases if f]).replace("..", ".")
-
-    return (
-        "<speak>"
-        f"{texto_formatado}"
-        "</speak>"
-    )
+    return texto
 
 REPROMPTS_MOTIVACAO = [
     "Agora que estamos motivados, quer explorar o que eu sei fazer?",

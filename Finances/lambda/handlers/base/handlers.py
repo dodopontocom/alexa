@@ -11,7 +11,7 @@ class LaunchRequestHandler(AbstractRequestHandler):
         return ask_utils.is_request_type("LaunchRequest")(handler_input)
 
     def handle(self, handler_input):
-        speak_output = '<speak><amazon:effect name="whispered">Ativando modo alternativo ultra secreto da Nasa</amazon:effect></speak>'
+        speak_output = "Ativando modo alternativo ultra secreto da Nasa"
         return (
             handler_input.response_builder
                 .speak(speak_output)

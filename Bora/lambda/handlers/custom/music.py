@@ -28,7 +28,7 @@ class PlayAutoplagioIntentHandler(AbstractRequestHandler):
             
             logger.info(f"Tocando música: {MUSIC_DATA['title']} - {MUSIC_DATA['artist']}")
             
-            speak_output = '<speak><amazon:effect name="whispered">eu vou roubar algo de mim</amazon:effect></speak>'
+            speak_output = "eu vou roubar algo de mim"
 
             # Criar a diretiva de reprodução com dados centralizados
             play_directive = PlayDirective(
@@ -75,7 +75,7 @@ class PlayAutoplagioFinalIntentHandler(AbstractRequestHandler):
             
             logger.info(f"Tocando música final: {MUSIC_DATA['title']}")
             
-            speak_output = '<speak><amazon:effect name="whispered">finalmente, eu roubei algo de mim por completo</amazon:effect></speak>'
+            speak_output = "finalmente, eu roubei algo de mim por completo"
 
             play_directive = PlayDirective(
                 play_behavior=PlayBehavior.REPLACE_ALL,

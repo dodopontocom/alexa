@@ -50,14 +50,10 @@ class BoraIntentHandler(AbstractRequestHandler):
                     speak_output = random.choice(RESPONSES_MOTIVATIONAL)
                     reprompt_text = random.choice(REPROMPTS_MOTIVACAO)
 
-            # Usando SSML com voz Ricardo
-            ssml_speech = f'<speak><voice name="Ricardo">{speak_output}</voice></speak>'
-            ssml_reprompt = f'<speak><voice name="Ricardo">{reprompt_text}</voice></speak>'
-            
             response = (
                 handler_input.response_builder
-                    .speak(ssml_speech)
-                    .ask(ssml_reprompt)
+                    .speak(speak_output)
+                    .ask(reprompt_text)
                     .response
             )
             
