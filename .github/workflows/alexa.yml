@@ -22,7 +22,7 @@ env:
   NODE_VERSION: '20'
 
 jobs:
-  list-skills:
+  pre-deploy-checks:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,6 +35,7 @@ jobs:
 
       - name: Install ASK CLI
         run: npm install -g ask-cli@${{ env.ASK_VERSION }}
+
       - name: Configure ASK CLI
         run: |
           mkdir -p ~/.ask
@@ -69,18 +70,60 @@ jobs:
           gh issue list --repo dodopontocom/finances --limit 5 --json number,state,title,labels,updatedAt --template \
             '{{range .}}| {{.number}} | {{.state}} | {{.title}} | {{range .labels}}{{.name}} {{end}} | {{.updatedAt}} |{{"\n"}}{{end}}' >> $GITHUB_STEP_SUMMARY
 
-      - name: Populate .env for Bora
+  deploy-skills:
+    runs-on: ubuntu-latest
+    needs: pre-deploy-checks
+    strategy:
+      matrix:
+        include:
+          - skill_name: Bora
+            skill_id: amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07
+            deploy_input: deploy_bora
+          - skill_name: Finances
+            skill_id: amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3
+            deploy_input: deploy_finances
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install ASK CLI
+        run: npm install -g ask-cli@${{ env.ASK_VERSION }}
+
+      - name: Configure ASK CLI
         run: |
-          cat > Bora/lambda/.env << EOF
+          mkdir -p ~/.ask
+          cat > ~/.ask/cli_config << EOF
+          {
+            "profiles": {
+              "default": {
+                "token": {
+                  "access_token": "${{ secrets.ASK_ACCESS_TOKEN }}",
+                  "refresh_token": "${{ secrets.ASK_REFRESH_TOKEN }}",
+                  "token_type": "bearer"
+                },
+                "vendor_id": "${{ secrets.ASK_VENDOR_ID }}"
+              }
+            }
+          }
+          EOF
+
+      - name: Populate Skill Configs
+        run: |
+          cat > ${{ matrix.skill_name }}/lambda/.env << EOF
           GITHUB_TOKEN=${{ secrets.MY_GITHUB_PAT }}
           EOF
-          mkdir -p Bora/.ask
-          cat > Bora/ask-resources.json << EOF
+          mkdir -p ${{ matrix.skill_name }}/.ask
+          cat > ${{ matrix.skill_name }}/ask-resources.json << EOF
           {
             "askcliResourcesVersion": "2020-03-31",
             "profiles": {
               "default": {
-                "skillId": "amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07",
+                "skillId": "${{ matrix.skill_id }}",
                 "skillInfrastructure": {
                   "type": "@ask-cli/hosted-skill-deployer"
                 }
@@ -88,51 +131,21 @@ jobs:
             }
           }
           EOF
-          cat > Bora/.ask/ask-states.json << EOF
+          cat > ${{ matrix.skill_name }}/.ask/ask-states.json << EOF
           {
             "askcliStatesVersion": "2020-03-31",
             "profiles": {
               "default": {
-                "skillId": "amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07"
+                "skillId": "${{ matrix.skill_id }}"
               }
             }
           }
           EOF
 
-      - name: Populate .env for Finances
+      - name: Deploy Skill
+        if: (matrix.deploy_input == 'deploy_bora' && github.event.inputs.deploy_bora == 'true') || (matrix.deploy_input == 'deploy_finances' && github.event.inputs.deploy_finances == 'true') || github.event_name == 'push'
         run: |
-          cat > Finances/lambda/.env << EOF
-          GITHUB_TOKEN=${{ secrets.MY_GITHUB_PAT }}
-          EOF
-          mkdir -p Finances/.ask
-          cat > Finances/ask-resources.json << EOF
-          {
-            "askcliResourcesVersion": "2020-03-31",
-            "profiles": {
-              "default": {
-                "skillId": "amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3",
-                "skillInfrastructure": {
-                  "type": "@ask-cli/hosted-skill-deployer"
-                }
-              }
-            }
-          }
-          EOF
-          cat > Finances/.ask/ask-states.json << EOF
-          {
-            "askcliStatesVersion": "2020-03-31",
-            "profiles": {
-              "default": {
-                "skillId": "amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3"
-              }
-            }
-          }
-          EOF
-
-      - name: Deploy Bora
-        if: github.event.inputs.deploy_bora == 'true' || github.event_name == 'push'
-        run: |
-          cd Bora
+          cd ${{ matrix.skill_name }}
           git init -b master
           git config user.email "workflow@github.actions"
           git config user.name "Github Workflow"
@@ -141,38 +154,14 @@ jobs:
           echo "ask-resources profile keys:"
           jq -r '.profiles | keys[]' ask-resources.json
           echo "skillId(default): $(jq -r '.profiles.default.skillId // "MISSING"' ask-resources.json)"
-          REPO_URL=$(ask smapi get-alexa-hosted-skill-metadata --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 | jq -r '.alexaHosted.repository.url')
+          REPO_URL=$(ask smapi get-alexa-hosted-skill-metadata --skill-id ${{ matrix.skill_id }} | jq -r '.alexaHosted.repository.url')
           REPO_URL=$(echo "$REPO_URL" | tr -d '`' | xargs)
           git remote add ask "$REPO_URL"
           git config credential.helper "!ask util git-credentials-helper --profile default"
           git add .
-          git commit -m "Deploy Bora via GitHub Actions" || echo "No changes to commit"
+          git commit -m "Deploy ${{ matrix.skill_name }} via GitHub Actions" || echo "No changes to commit"
           git push ask master --force
           git push ask master:dev --force
 
-          echo "### 🚀 Set and Build Bora Interaction Model"
-          ask smapi set-interaction-model --skill-id amzn1.ask.skill.c6b401b2-aa7e-4553-920c-9c38028afa07 --stage development --locale pt-BR --interaction-model "$(cat skill-package/interactionModels/custom/pt-BR.json)"
-
-      - name: Deploy Finances
-        if: github.event.inputs.deploy_finances == 'true' || github.event_name == 'push'
-        run: |
-          cd Finances
-          git init -b master
-          git config user.email "workflow@github.actions"
-          git config user.name "Github Workflow"
-          echo "Deploy cwd: $(pwd)"
-          test -f ask-resources.json
-          echo "ask-resources profile keys:"
-          jq -r '.profiles | keys[]' ask-resources.json
-          echo "skillId(default): $(jq -r '.profiles.default.skillId // "MISSING"' ask-resources.json)"
-          REPO_URL=$(ask smapi get-alexa-hosted-skill-metadata --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 | jq -r '.alexaHosted.repository.url')
-          REPO_URL=$(echo "$REPO_URL" | tr -d '`' | xargs)
-          git remote add ask "$REPO_URL"
-          git config credential.helper "!ask util git-credentials-helper --profile default"
-          git add .
-          git commit -m "Deploy Finances via GitHub Actions" || echo "No changes to commit"
-          git push ask master --force
-          git push ask master:dev --force
-
-          echo "### 🚀 Set and Build Finances Interaction Model"
-          ask smapi set-interaction-model --skill-id amzn1.ask.skill.488d4044-3016-473c-915f-37e50513a5e3 --stage development --locale pt-BR --interaction-model "$(cat skill-package/interactionModels/custom/pt-BR.json)"
+          echo "### 🚀 Set and Build ${{ matrix.skill_name }} Interaction Model"
+          ask smapi set-interaction-model --skill-id ${{ matrix.skill_id }} --stage development --locale pt-BR --interaction-model "$(cat skill-package/interactionModels/custom/pt-BR.json)"
